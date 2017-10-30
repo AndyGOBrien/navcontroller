@@ -8,7 +8,8 @@ import com.llamalabb.navcontroller.BaseView
  */
 interface LauncherContract {
     interface View : BaseView<Presenter>{
-
+        fun showCompanyFrag()
+        fun showProductFrag()
     }
 
     interface Presenter : BasePresenter {

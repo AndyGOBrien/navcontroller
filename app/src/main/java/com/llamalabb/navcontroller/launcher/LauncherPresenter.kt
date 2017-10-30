@@ -7,6 +7,6 @@ class LauncherPresenter(val view: LauncherContract.View) :
         LauncherContract.Presenter{
 
     override fun onStart(){
-
+        view.showCompanyFrag()
     }
 }

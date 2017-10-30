@@ -13,24 +13,35 @@ class LauncherActivity :
         LauncherContract.View,
         CompanyFragment.CompanyFragmentListener,
         ProductFragment.ProductFragmentListener{
-    override var presenter: LauncherContract.Presenter = LauncherPresenter(this)
 
-    var companyNo: Int = 0
+    override var presenter: LauncherContract.Presenter = LauncherPresenter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
 
+        presenter.onStart()
+
+
+    }
+
+    override fun showCompanyFrag() {
         var fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.mainLayout, CompanyFragment()).commit()
     }
 
-    override fun setCurrentCompanyNo(position: Int) { companyNo = position }
+    override fun loadProducts() {
+        showProductFrag()
+    }
 
+    override fun showProductFrag() {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.mainLayout, ProductFragment())
+        fragmentTransaction.addToBackStack(null)
 
-    override fun getCurrentCompanyNo() : Int{
-        return companyNo
+        fragmentTransaction.commit()
     }
 
 }

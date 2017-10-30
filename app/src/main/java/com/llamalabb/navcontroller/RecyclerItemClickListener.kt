@@ -1,7 +1,6 @@
-package com.llamalabb.navcontroller.company
+package com.llamalabb.navcontroller
 
 import android.content.Context
-import android.os.Build.VERSION_CODES.O
 import android.support.v7.widget.RecyclerView
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
