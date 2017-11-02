@@ -31,15 +31,19 @@ object DataManager {
     }
 
     fun getCompanyProductList(): List<Product>{
-        return companyList[companyNum].productList
+        return companyList[companyNum].productList!!
     }
 
     private fun createDummyCompanyList(){
-        DataManager.addCompany(Company("Apple", "apple.com", dummyAppleProducts()))
-        DataManager.addCompany(Company("Samsung", "samsung.com", dummySamsungProducts()))
-        DataManager.addCompany(Company("Motorola", "motorola.com", dummyMotorolaProducts()))
-        DataManager.addCompany(Company("Microsoft","microsoft.com", dummyMicrosoftProducts()))
-        DataManager.addCompany(Company("Google", "google.com", dummyGoogleProducts()))
+        addCompany(Company("Apple", "apple.com", productList = dummyAppleProducts()))
+        addCompany(Company("Samsung", "samsung.com",
+                productList = dummySamsungProducts()))
+        addCompany(Company("Motorola", "motorola.com",
+                productList = dummyMotorolaProducts()))
+        addCompany(Company("Microsoft","microsoft.com",
+                productList = dummyMicrosoftProducts()))
+        addCompany(Company("Google", "google.com",
+                productList = dummyGoogleProducts()))
     }
 
     private fun dummyAppleProducts(): List<Product>{
