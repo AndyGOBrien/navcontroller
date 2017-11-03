@@ -1,7 +1,6 @@
 package com.llamalabb.navcontroller.products
 
 import com.llamalabb.navcontroller.data.DataManager
-import com.llamalabb.navcontroller.data.DataManager.getCompanyProductList
 import com.llamalabb.navcontroller.data.Product
 
 /**
@@ -37,10 +36,13 @@ class ProductsPresenter(val productsView: ProductsContract.View) :
     }
 
     private fun processProducts(products: List<Product>){
-        if(products.isEmpty())
-            productsView.showNoProducts()
-        else
-            productsView.showProducts(products)
-    }
+        with(DataManager){
+            val companyName = getCompanyList()[companyNum].name
 
+            if(products.isEmpty())
+                productsView.showNoProducts(companyName)
+            else
+                productsView.showProducts(companyName, products)
+        }
+    }
 }

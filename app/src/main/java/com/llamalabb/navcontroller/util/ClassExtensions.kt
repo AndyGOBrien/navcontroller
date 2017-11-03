@@ -3,7 +3,6 @@ package com.llamalabb.navcontroller.util
 /**
  * Created by andy on 10/31/17.
  */
-import android.content.Context
 import android.support.annotation.IdRes
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -11,9 +10,7 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.widget.ImageView
-import android.widget.Toast
 import com.llamalabb.navcontroller.GlideApp
-import com.llamalabb.navcontroller.utils.Utils
 
 
 /**

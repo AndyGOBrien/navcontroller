@@ -31,7 +31,11 @@ object DataManager {
     }
 
     fun getCompanyProductList(): List<Product>{
-        return companyList[companyNum].productList!!
+        return companyList[companyNum].productList
+    }
+
+    fun addCompanyProduct(product: Product){
+        companyList[companyNum].productList.add(product)
     }
 
     private fun createDummyCompanyList(){
@@ -46,7 +50,7 @@ object DataManager {
                 productList = dummyGoogleProducts()))
     }
 
-    private fun dummyAppleProducts(): List<Product>{
+    private fun dummyAppleProducts(): ArrayList<Product>{
         var list: ArrayList<Product> = ArrayList()
 
         list.add(Product("Iphone"))
@@ -57,7 +61,7 @@ object DataManager {
 
     }
 
-    private fun dummySamsungProducts(): List<Product>{
+    private fun dummySamsungProducts(): ArrayList<Product>{
         var list: ArrayList<Product> = ArrayList()
         list.add(Product("Galaxy s"))
         list.add(Product("Galaxy Note"))
@@ -66,7 +70,7 @@ object DataManager {
         return list
     }
 
-    private fun dummyMotorolaProducts(): List<Product>{
+    private fun dummyMotorolaProducts(): ArrayList<Product>{
         var list: ArrayList<Product> = ArrayList()
         list.add(Product("Moto E"))
         list.add(Product("Moto G"))
@@ -75,7 +79,7 @@ object DataManager {
         return list
     }
 
-    private fun dummyMicrosoftProducts(): List<Product>{
+    private fun dummyMicrosoftProducts(): ArrayList<Product>{
         var list: ArrayList<Product> = ArrayList()
         list.add(Product("Lumia 540"))
         list.add(Product("Lumia 640"))
@@ -84,7 +88,7 @@ object DataManager {
         return list
     }
 
-    private fun dummyGoogleProducts(): List<Product>{
+    private fun dummyGoogleProducts(): ArrayList<Product>{
         var list: ArrayList<Product> = ArrayList()
         list.add(Product("Nexus 6P"))
         list.add(Product("Pixel"))

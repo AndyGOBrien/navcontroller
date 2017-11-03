@@ -5,9 +5,9 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import com.llamalabb.navcontroller.R
+import com.llamalabb.navcontroller.companies.add.AddCompanyActivity
 import com.llamalabb.navcontroller.products.ProductsActivity
 import com.llamalabb.navcontroller.util.replaceFragmentInActivity
-import com.llamalabb.navcontroller.utils.Utils
 import kotlinx.android.synthetic.main.products_act.*
 
 
@@ -36,13 +36,13 @@ class CompaniesActivity : AppCompatActivity(), CompaniesFragment.CompanyFragment
                 fab_add_product -> fabClickAction()
             }
         }
-
         fab_add_product.setOnClickListener(clickListener)
-
     }
 
     private fun fabClickAction(){
-        Utils.showMessageShort(this, "Fab Clicked")
+
+        startActivity(Intent(this, AddCompanyActivity::class.java))
+
     }
 
     override fun loadProducts() {

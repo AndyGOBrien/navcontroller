@@ -9,5 +9,5 @@ data class Company(
         var logoURL: String = "https://logo.clearbit.com/$domain",
         var stockTicker: String? = null,
         var stockPrice: Double? = null,
-        var productList: List<Product>? = null
+        var productList: ArrayList<Product> = ArrayList()
 )

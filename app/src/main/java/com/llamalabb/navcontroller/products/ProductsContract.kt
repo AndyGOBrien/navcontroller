@@ -9,8 +9,8 @@ import com.llamalabb.navcontroller.data.Product
  */
 interface ProductsContract {
     interface View : BaseView<Presenter>{
-        fun showProducts(list: List<Product>)
-        fun showNoProducts()
+        fun showProducts(companyName: String, list: List<Product>)
+        fun showNoProducts(companyName: String)
         fun setLoadingIndicator(active: Boolean)
     }
 

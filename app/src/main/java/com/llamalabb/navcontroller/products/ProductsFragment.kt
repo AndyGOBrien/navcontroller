@@ -12,6 +12,7 @@ import android.widget.TextView
 
 import com.llamalabb.navcontroller.R
 import com.llamalabb.navcontroller.data.Product
+import com.llamalabb.navcontroller.utils.Utils
 import kotlinx.android.synthetic.main.products_frag.*
 import kotlinx.android.synthetic.main.products_frag.view.*
 
@@ -50,13 +51,16 @@ class ProductsFragment : Fragment(), ProductsContract.View {
         }
     }
 
-    override fun showProducts(list: List<Product>) {
+    override fun showProducts(companyName: String, list: List<Product>) {
         recyclerAdapter.products = list
+        company_display_textView.text = "$companyName's Product List"
         products_layout.visibility = View.VISIBLE
         no_products_layout.visibility = View.GONE
+
     }
 
-    override fun showNoProducts(){
+    override fun showNoProducts(companyName: String){
+        company_display_textView.text = "$companyName's Product List"
         products_layout.visibility = View.GONE
         no_products_layout.visibility = View.VISIBLE
     }
@@ -89,7 +93,14 @@ class ProductsFragment : Fragment(), ProductsContract.View {
         }
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            holder.textProductName.text = products[position].name
+
+            val name = products[position].name
+
+            holder.textProductName.apply {
+                text = name
+                setOnClickListener { Utils.showMessageShort(msg = name) }
+            }
+
         }
 
         override fun getItemCount(): Int {
