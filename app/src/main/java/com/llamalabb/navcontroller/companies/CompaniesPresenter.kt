@@ -7,7 +7,24 @@ import com.llamalabb.navcontroller.data.DataManager
  * Created by andy on 10/24/17.
  */
 class CompaniesPresenter(val companiesView: CompaniesContract.View) :
-        CompaniesContract.Presenter{
+        CompaniesContract.Presenter,
+        DataManager.DataManagerCallBack{
+
+    private var loadIndicator = 0
+
+    override fun onFailure() {
+        companiesView.setLoadingIndicator(false)
+    }
+    override fun onSuccuss() {
+        companiesView.showCompanies(DataManager.getCompanyList())
+        loadIndicator += 1
+        if(loadIndicator >= DataManager.getCompanyList().size) {
+            companiesView.setLoadingIndicator(false)
+            loadIndicator = 0
+        }
+
+
+    }
 
     private var firstLoad = true
 
@@ -28,16 +45,18 @@ class CompaniesPresenter(val companiesView: CompaniesContract.View) :
         if(showLoadingUI) companiesView.setLoadingIndicator(true)
 
         val companies = DataManager.getCompanyList()
-        processCompanies(companies)
 
-        companiesView.setLoadingIndicator(false)
+        processCompanies(companies)
     }
 
     private fun processCompanies(companies: List<Company>){
-        if(companies.isEmpty())
+        if(companies.isEmpty()) {
             companiesView.showNoCompanies()
-        else
+        }
+        else {
+            for(company in companies) DataManager.getStockData(company, callBack = this)
             companiesView.showCompanies(companies)
+        }
     }
 
     override fun setCompanyNum(position: Int) {
