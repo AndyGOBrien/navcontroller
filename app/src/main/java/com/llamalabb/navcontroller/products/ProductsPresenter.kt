@@ -1,13 +1,15 @@
 package com.llamalabb.navcontroller.products
 
-import com.llamalabb.navcontroller.data.DataManager
+import com.llamalabb.navcontroller.data.CompaniesRepository
 import com.llamalabb.navcontroller.data.Product
 
 /**
  * Created by andy on 10/24/17.
  */
-class ProductsPresenter(val productsView: ProductsContract.View) :
-        ProductsContract.Presenter{
+class ProductsPresenter(
+        private val productsView: ProductsContract.View,
+        private val companiesRepository: CompaniesRepository)
+    : ProductsContract.Presenter{
 
     private var firstLoad = true
 
@@ -29,14 +31,14 @@ class ProductsPresenter(val productsView: ProductsContract.View) :
             productsView.setLoadingIndicator(true)
         }
 
-        val products = DataManager.getCompanyProductList()
+        val products = companiesRepository.getCompanyProductList()
         processProducts(products)
 
         productsView.setLoadingIndicator(false)
     }
 
     private fun processProducts(products: List<Product>){
-        with(DataManager){
+        with(companiesRepository){
             val companyName = getCompanyList()[companyNum].name
 
             if(products.isEmpty())

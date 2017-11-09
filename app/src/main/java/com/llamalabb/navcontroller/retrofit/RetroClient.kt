@@ -8,15 +8,34 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 object RetroClient {
 
-    private val ROOT_URL = "https://www.alphavantage.co"
+    private val STOCK_ROOT_URL = "https://www.alphavantage.co"
+    private val POTENTIAL_COMPANY_INFO_ROOT_URL ="https://autocomplete.clearbit.com/"
+    private val COMPANY_INFO_ROOT_URL = "https://company.clearbit.com/"
 
-    private fun getRetrofitInstance() : Retrofit{
+    private fun getStockRetrofitInstance() : Retrofit{
         return Retrofit.Builder()
-                .baseUrl(ROOT_URL)
+                .baseUrl(STOCK_ROOT_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
     }
 
-    fun getApiService() : ApiService = getRetrofitInstance().create(ApiService::class.java)
+    private fun getPotentialCompanyInfoRetrofitInstance() : Retrofit{
+        return Retrofit.Builder()
+                .baseUrl(POTENTIAL_COMPANY_INFO_ROOT_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+    }
+
+    private fun getCompanyInfoRetrofitInstance() : Retrofit{
+        return Retrofit.Builder()
+                .baseUrl(COMPANY_INFO_ROOT_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+    }
+
+    fun getStockApiService() : ApiService = getStockRetrofitInstance().create(ApiService::class.java)
+    fun getPotentialCompanyInfoApiService() : ApiService = getPotentialCompanyInfoRetrofitInstance().create(ApiService::class.java)
+    fun getCompanyInfoApiService() : ApiService = getCompanyInfoRetrofitInstance().create(ApiService::class.java)
+
 
 }

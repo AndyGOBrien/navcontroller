@@ -1,14 +1,20 @@
 package com.llamalabb.navcontroller.data
 
-import java.time.temporal.TemporalAdjusters.next
+import com.llamalabb.navcontroller.data.stock.StockManager
+import java.util.*
+
 
 /**
  * Created by andy on 10/24/17.
  */
-data class Company(val name: String,
-                   val domain: String,
-                   var logoURL: String = "https://logo.clearbit.com/$domain",
-                   var stockTicker: String? = null,
-                   var stockPrice: String? = null,
-                   var productList: ArrayList<Product> = ArrayList()
+data class Company(
+        val name: String,
+        val domain: String,
+        val initialStockTicker: String?,
+        val id: String = UUID.randomUUID().toString(),
+        var logoURL: String = "https://logo.clearbit.com/$domain",
+        var productList: ArrayList<Product> = ArrayList(),
+        val stockManager: StockManager = StockManager(
+                stockTicker = initialStockTicker)
 )
+

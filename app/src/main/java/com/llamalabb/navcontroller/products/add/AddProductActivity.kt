@@ -4,8 +4,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.llamalabb.navcontroller.R
-import com.llamalabb.navcontroller.data.DataManager
-import com.llamalabb.navcontroller.data.Product
+import com.llamalabb.navcontroller.data.CompaniesDataSource
+import com.llamalabb.navcontroller.data.CompaniesRepository
+import com.llamalabb.navcontroller.data.source.CompaniesLocalDataSource
 import kotlinx.android.synthetic.main.add_product_act.*
 
 /**
@@ -13,18 +14,22 @@ import kotlinx.android.synthetic.main.add_product_act.*
  */
 class AddProductActivity : AppCompatActivity(){
 
+    private lateinit var companiesRepository: CompaniesRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_product_act)
+
+        companiesRepository = CompaniesRepository.getInstance(
+                CompaniesLocalDataSource.getInstance(this))
 
         setClickListeners()
 
     }
 
-    private fun addButtonAction(){
+    private fun addButtonAction() {
         val productName = product_name_editText.text.toString()
-
-        DataManager.addCompanyProduct(Product(productName))
+        companiesRepository.addCompanyProduct(productName)
         finish()
     }
 

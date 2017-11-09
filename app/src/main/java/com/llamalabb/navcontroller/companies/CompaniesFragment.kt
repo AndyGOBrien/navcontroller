@@ -110,13 +110,14 @@ class CompaniesFragment : Fragment(), CompaniesContract.View{
         override fun getItemCount(): Int {return companies.size}
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            companies[position].let{
-                holder.apply{
-                    txtView.text = it.name
-                    stockTickerText.text = it.stockTicker?.let{it + ": "}
-                    stockPriceText.text = it.stockPrice?.let{it}
-                    logoImg.loadImage(it.logoURL)
-                }
+            val company = companies[position]
+            val stockManager = company.stockManager
+
+            holder.apply{
+                txtView.text = company.name
+                stockTickerText.text = stockManager.stockTicker?.let{"$it: "}
+                stockPriceText.text = stockManager.stockPrice?.let{"$$it"}
+                logoImg.loadImage(company.logoURL)
             }
         }
 
