@@ -8,12 +8,11 @@ import com.llamalabb.navcontroller.R
 import com.llamalabb.navcontroller.companies.add.AddCompanyActivity
 import com.llamalabb.navcontroller.data.CompaniesRepository
 import com.llamalabb.navcontroller.data.source.CompaniesLocalDataSource
-import com.llamalabb.navcontroller.products.ProductsActivity
 import com.llamalabb.navcontroller.util.replaceFragmentInActivity
 import kotlinx.android.synthetic.main.products_act.*
 
 
-class CompaniesActivity : AppCompatActivity(), CompaniesFragment.CompanyFragmentListener{
+class CompaniesActivity : AppCompatActivity(){
     private lateinit var companiesPresenter: CompaniesPresenter
 
 
@@ -35,8 +34,6 @@ class CompaniesActivity : AppCompatActivity(), CompaniesFragment.CompanyFragment
             }
         }
 
-
-
         setClickListeners()
     }
 
@@ -53,10 +50,6 @@ class CompaniesActivity : AppCompatActivity(), CompaniesFragment.CompanyFragment
 
         startActivity(Intent(this, AddCompanyActivity::class.java))
 
-    }
-
-    override fun loadProducts() {
-        startActivity(Intent(this, ProductsActivity::class.java))
     }
 
 }

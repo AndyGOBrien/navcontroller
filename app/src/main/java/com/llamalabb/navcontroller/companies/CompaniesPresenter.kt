@@ -12,32 +12,17 @@ class CompaniesPresenter(val companiesView: CompaniesContract.View,
     : CompaniesContract.Presenter,
         CompaniesRepository.DataManagerCallBack{
 
-    private var loadIndicator = 0
-
-    override fun onFailure() {
-        loadIndicator += 1
-        if(loadIndicator >= companiesRepository.getCompanyList().size){
-            companiesView.setLoadingIndicator(false)
-            loadIndicator = 0
-        }
-    }
-    override fun onSuccuss() {
-        companiesView.showCompanies(companiesRepository.getCompanyList())
-        loadIndicator += 1
-        if(loadIndicator >= companiesRepository.getCompanyList().size) {
-            companiesView.setLoadingIndicator(false)
-            loadIndicator = 0
-        }
-    }
-
-    private var firstLoad = true
 
     init{
         companiesView.presenter = this
     }
 
+    private var loadIndicator = 0
+
+    private var firstLoad = true
+
     override fun onStart() {
-        loadCompanies(false)
+        loadCompanies(firstLoad)
     }
 
     override fun loadCompanies(forceUpdate: Boolean) {
@@ -48,25 +33,22 @@ class CompaniesPresenter(val companiesView: CompaniesContract.View,
     private fun loadCompanies(forceUpdate: Boolean, showLoadingUI: Boolean){
         if(showLoadingUI) companiesView.setLoadingIndicator(true)
 
-        //val companies = companiesRepository.getCompanyList()
-
-
         companiesRepository.getCompanies(object: CompaniesDataSource.LoadCompaniesCallback{
             override fun onCompaniesLoaded(companies: List<Company>) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                processCompanies(companies)
             }
 
             override fun onDataNotAvailable() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                companiesView.showNoCompanies()
+                companiesView.setLoadingIndicator(false)
             }
         })
-
-        //processCompanies(companies)
     }
 
     private fun processCompanies(companies: List<Company>){
         if(companies.isEmpty()) {
             companiesView.showNoCompanies()
+            companiesView.setLoadingIndicator(false)
         }
         else {
             for(company in companies) companiesRepository.processStockData(company, callBack = this)
@@ -74,9 +56,30 @@ class CompaniesPresenter(val companiesView: CompaniesContract.View,
         }
     }
 
-    override fun setCompanyNum(position: Int) {
-        companiesRepository.companyNum = position
+    override fun openCompanyProducts(requestedCompany: Company) {
+        companiesView.showProductsUi(requestedCompany.id)
     }
 
+    override fun deleteCompany(requestedCompany: Company){
+        with(companiesRepository) {
+            deleteCompany(requestedCompany.id)
+            processCompanies(ArrayList(cachedCompanies.values))
+        }
+    }
 
+    override fun onFailure() {
+        loadIndicator += 1
+        if(loadIndicator >= companiesRepository.cachedCompanies.size){
+            companiesView.setLoadingIndicator(false)
+            loadIndicator = 0
+        }
+    }
+    override fun onSuccess() {
+        companiesView.showCompanies(ArrayList(companiesRepository.cachedCompanies.values))
+        loadIndicator += 1
+        if(loadIndicator >= companiesRepository.cachedCompanies.size) {
+            companiesView.setLoadingIndicator(false)
+            loadIndicator = 0
+        }
+    }
 }

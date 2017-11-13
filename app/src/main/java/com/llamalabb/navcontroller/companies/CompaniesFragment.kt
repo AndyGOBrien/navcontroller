@@ -1,9 +1,10 @@
 package com.llamalabb.navcontroller.companies
 
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -12,9 +13,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.llamalabb.navcontroller.R
-import com.llamalabb.navcontroller.RecyclerItemClickListener
 import com.llamalabb.navcontroller.data.Company
+import com.llamalabb.navcontroller.products.ProductsActivity
 import com.llamalabb.navcontroller.util.loadImage
+import com.llamalabb.navcontroller.utils.Utils
 
 import kotlinx.android.synthetic.main.companies_frag.*
 import kotlinx.android.synthetic.main.companies_frag.view.*
@@ -25,9 +27,20 @@ import kotlinx.android.synthetic.main.companies_frag.view.*
 class CompaniesFragment : Fragment(), CompaniesContract.View{
 
     override lateinit var presenter: CompaniesContract.Presenter
-    lateinit var listener: CompanyFragmentListener
 
-    private val recyclerAdapter = CompaniesRecyclerAdapter(ArrayList(0))
+    private var itemListener: CompanyItemListener = object : CompanyItemListener {
+        override fun onCompanyClick(clickedCompany: Company) {
+            presenter.openCompanyProducts(clickedCompany)
+        }
+
+        override fun onCompanyLongPress(longClickedCompany: Company) {
+            Utils.showMessageShort(context, "Company Deleted")
+            presenter.deleteCompany(longClickedCompany)
+        }
+
+    }
+
+    private val recyclerAdapter = CompaniesRecyclerAdapter(ArrayList(0), itemListener)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -38,7 +51,6 @@ class CompaniesFragment : Fragment(), CompaniesContract.View{
             val recyclerView = (companies_recyclerView as RecyclerView).apply {
                 adapter = recyclerAdapter
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                setRecyclerOnItemClickListener(this)
             }
 
             refresh_layout.apply {
@@ -49,11 +61,6 @@ class CompaniesFragment : Fragment(), CompaniesContract.View{
 
         return root
 
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listener = context as CompanyFragmentListener
     }
 
     override fun setLoadingIndicator(active: Boolean) {
@@ -75,23 +82,14 @@ class CompaniesFragment : Fragment(), CompaniesContract.View{
         no_companies_layout.visibility = View.VISIBLE
     }
 
-    private fun setRecyclerOnItemClickListener(view: RecyclerView) {
-
-        val itemClickListener = object : RecyclerItemClickListener.OnItemClickListener{
-            override fun onItemClick(view: View, position: Int) {
-                presenter.setCompanyNum(position)
-                listener.loadProducts()
-            }
-            override fun onLongItemClick(view: View, position: Int) {
-                //TODO: implement hold and drag to new position
-            }
+    override fun showProductsUi(companyId: String) {
+        val intent = Intent(context, ProductsActivity::class.java).apply{
+            putExtra(ProductsActivity.COMPANY_ID, companyId)
         }
-
-        view.addOnItemTouchListener(RecyclerItemClickListener(context, view, itemClickListener))
-
+        startActivity(intent)
     }
 
-    private class CompaniesRecyclerAdapter(companies: List<Company>) :
+    private class CompaniesRecyclerAdapter(companies: List<Company>, private val itemListener: CompanyItemListener) :
             RecyclerView.Adapter<CompaniesRecyclerAdapter.MyViewHolder>(){
 
         var companies: List<Company> = companies
@@ -103,9 +101,11 @@ class CompaniesFragment : Fragment(), CompaniesContract.View{
         class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
             var txtView: TextView = view.findViewById(R.id.txtView)
-            var logoImg: ImageView = view.findViewById(R.id.imageView)
+            var logoImg: ImageView = view.findViewById(R.id.product_logo_image)
             var stockTickerText: TextView = view.findViewById(R.id.stock_ticker_text)
             var stockPriceText: TextView = view.findViewById(R.id.stock_price_text)
+            var companyView: CardView = view.findViewById(R.id.company_card_view)
+
         }
         override fun getItemCount(): Int {return companies.size}
 
@@ -118,6 +118,11 @@ class CompaniesFragment : Fragment(), CompaniesContract.View{
                 stockTickerText.text = stockManager.stockTicker?.let{"$it: "}
                 stockPriceText.text = stockManager.stockPrice?.let{"$$it"}
                 logoImg.loadImage(company.logoURL)
+                companyView.setOnClickListener{ itemListener.onCompanyClick(company) }
+                companyView.setOnLongClickListener {
+                    itemListener.onCompanyLongPress(company)
+                    true
+                }
             }
         }
 
@@ -139,9 +144,9 @@ class CompaniesFragment : Fragment(), CompaniesContract.View{
         fun newInstance() = CompaniesFragment()
     }
 
-
-    interface CompanyFragmentListener {
-        fun loadProducts()
+    interface CompanyItemListener {
+        fun onCompanyClick(clickedCompany: Company)
+        fun onCompanyLongPress(longPressedCompany: Company)
     }
 
 }

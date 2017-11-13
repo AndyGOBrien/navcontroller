@@ -11,19 +11,23 @@ import com.llamalabb.navcontroller.products.add.AddProductActivity
 import com.llamalabb.navcontroller.util.replaceFragmentInActivity
 import kotlinx.android.synthetic.main.products_act.*
 
-class ProductsActivity : AppCompatActivity(), ProductsFragment.ProductFragmentListener {
+class ProductsActivity : AppCompatActivity(){
     private lateinit var productsPresenter: ProductsPresenter
+
+    lateinit var companyId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.products_act)
+
+        companyId = intent.getStringExtra(COMPANY_ID)
 
         val productsFragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
                 as ProductsFragment? ?:ProductsFragment.newInstance().also{
             replaceFragmentInActivity(it, R.id.contentFrame)
         }
 
-        productsPresenter = ProductsPresenter(productsFragment, CompaniesRepository.getInstance(
+        productsPresenter = ProductsPresenter(companyId, productsFragment, CompaniesRepository.getInstance(
                 CompaniesLocalDataSource.getInstance(this))).apply {
 
             if(savedInstanceState != null){
@@ -45,8 +49,14 @@ class ProductsActivity : AppCompatActivity(), ProductsFragment.ProductFragmentLi
 
     private fun fabClickAction(){
 
-        startActivity(Intent(this, AddProductActivity::class.java))
+        startActivity(Intent(this, AddProductActivity::class.java).apply{
+            putExtra(COMPANY_ID, companyId)
+        })
 
+    }
+
+    companion object{
+        val COMPANY_ID = "COMPANY_ID"
     }
 
 }

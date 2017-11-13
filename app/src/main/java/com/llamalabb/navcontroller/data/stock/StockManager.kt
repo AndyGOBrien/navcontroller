@@ -1,7 +1,7 @@
 package com.llamalabb.navcontroller.data.stock
 
 import android.util.Log
-import com.llamalabb.navcontroller.data.CompaniesDataSource
+import com.llamalabb.navcontroller.data.CompaniesRepository
 import com.llamalabb.navcontroller.retrofit.ApiService
 import com.llamalabb.navcontroller.retrofit.RetroClient
 import retrofit2.Call
@@ -16,7 +16,7 @@ data class StockManager(
         var stockTicker: String? = null,
         var stockPrice: String? = null) {
 
-    fun getStockData(callBack: CompaniesDataSource.DataManagerCallBack,
+    fun getStockData(callBack: CompaniesRepository.DataManagerCallBack,
                      interval: String,
                      function: String) {
 
@@ -49,7 +49,7 @@ data class StockManager(
                         Log.d("INTRADAY 1", "SUCCESS!")
                         stockPrice = data.values.iterator().next().close
                         retry = 0
-                        callBack.onSuccuss()
+                        callBack.onSuccess()
                     } else {
                         retry += 1
                         onFailure(call, Throwable("Empty List"))

@@ -1,6 +1,6 @@
 package com.llamalabb.navcontroller.retrofit
 
-import com.llamalabb.navcontroller.PotentialCompany
+import com.llamalabb.navcontroller.companies.PotentialCompany
 import com.llamalabb.navcontroller.data.stock.StockDataMap
 import retrofit2.Call
 import retrofit2.http.GET

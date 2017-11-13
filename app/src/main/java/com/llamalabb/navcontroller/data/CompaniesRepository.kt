@@ -1,68 +1,134 @@
 package com.llamalabb.navcontroller.data
 
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 /**
  * Created by andy on 10/30/17.
  */
 class CompaniesRepository(val companiesLocalDataSource: CompaniesDataSource) : CompaniesDataSource {
 
+    var cachedCompanies: LinkedHashMap<String, Company> = LinkedHashMap()
+
+    var cacheIsDirty = false
+
 
     override fun getCompanies(callback: CompaniesDataSource.LoadCompaniesCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        if(cachedCompanies.isNotEmpty() && !cacheIsDirty){
+            callback.onCompaniesLoaded(ArrayList(cachedCompanies.values))
+            return
+        }
+
+        companiesLocalDataSource.getCompanies(object: CompaniesDataSource.LoadCompaniesCallback {
+            override fun onCompaniesLoaded(companies: List<Company>) {
+                refreshCache(companies)
+                callback.onCompaniesLoaded(ArrayList(cachedCompanies.values))
+            }
+
+            override fun onDataNotAvailable() {
+
+                callback.onDataNotAvailable()
+
+            }
+        })
+    }
+
+    override fun getProducts(companyId: String, callback: CompaniesDataSource.LoadProductsCallback) {
+        companiesLocalDataSource.getProducts(companyId,
+                object: CompaniesDataSource.LoadProductsCallback {
+            override fun onProductsLoaded(products: List<Product>) {
+                callback.onProductsLoaded(products)
+            }
+
+            override fun onDataNotAvailable() {
+                callback.onDataNotAvailable()
+            }
+
+        })
     }
 
     override fun getCompany(companyId: String, callback: CompaniesDataSource.GetCompanyCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        val taskInCache = getCompanyWithId(companyId)
+
+        if (taskInCache != null) {
+            callback.onCompanyLoaded(taskInCache)
+            return
+        }
+
+        companiesLocalDataSource.getCompany(companyId, object : CompaniesDataSource.GetCompanyCallback {
+            override fun onCompanyLoaded(company: Company) {
+                cacheAndPerform(company) {
+                    callback.onCompanyLoaded(it)
+                }
+            }
+
+            override fun onDataNotAvailable() {
+
+            }
+        })
     }
 
     override fun saveCompany(company: Company) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        cacheAndPerform(company){
+            companiesLocalDataSource.saveCompany(company)
+        }
+
     }
 
     override fun deleteAllCompanies() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        companiesLocalDataSource.deleteAllCompanies()
+        cachedCompanies.clear()
     }
 
     override fun deleteCompany(companyId: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        companiesLocalDataSource.deleteCompany(companyId)
+        companiesLocalDataSource.deleteAllProducts(companyId)
+        cachedCompanies.remove(companyId)
     }
 
-    private var companyList: ArrayList<Company> = ArrayList()
-
-    var companyNum: Int
-
-    init{
-        createDummyCompanies()
-        companyNum = 0
-    }
-
-    interface DataManagerCallBack{
-        fun onSuccuss()
-        fun onFailure()
+    override fun deleteAllProducts(companyId: String) {
+        companiesLocalDataSource.deleteAllProducts(companyId)
     }
 
 
-    fun addCompany(company: Company){
-        companyList.add(company)
+    override fun saveProduct(product: Product) {
+        companiesLocalDataSource.saveProduct(product)
     }
 
-    fun getCompanyList() : ArrayList<Company>{
-        return companyList
+    override fun deleteProduct(productId: String) {
+        companiesLocalDataSource.deleteProduct(productId)
     }
 
-    fun clearCompanyList(){
-        companyList.clear()
-    }
-
-    fun getCompanyProductList(): List<Product>{
-        return companyList[companyNum].productList
-    }
-
-    fun addCompanyProduct(productName: String){
-        companyList[companyNum].let {
-            it.productList.add(Product(productName, it.id))
+    private fun refreshCache(companies: List<Company>) {
+        cachedCompanies.clear()
+        companies.forEach {
+            cacheAndPerform(it) {}
         }
+        cacheIsDirty = false
+    }
+
+    private fun refreshLocalDataSource(companies: List<Company>) {
+        companiesLocalDataSource.deleteAllCompanies()
+        for (company in companies) {
+            companiesLocalDataSource.saveCompany(company)
+        }
+    }
+
+    private fun getCompanyWithId(id: String) = cachedCompanies[id]
+
+    private inline fun cacheAndPerform(company: Company, perform: (Company) -> Unit) {
+        val cachedCompany = Company(
+                company.name,
+                company.domain,
+                id = company.id,
+                logoURL = company.logoURL,
+                stockManager = company.stockManager)
+
+        cachedCompanies.put(cachedCompany.id, cachedCompany)
+        perform(cachedCompany)
     }
 
     fun processStockData(
@@ -73,6 +139,26 @@ class CompaniesRepository(val companiesLocalDataSource: CompaniesDataSource) : C
 
         company.stockManager.getStockData(callBack, interval, function)
     }
+
+    interface DataManagerCallBack{
+        fun onSuccess()
+        fun onFailure()
+    }
+
+    companion object {
+
+        private var INSTANCE: CompaniesRepository? = null
+
+        @JvmStatic fun getInstance(companiesLocalDataSource: CompaniesDataSource): CompaniesRepository {
+            return INSTANCE ?: CompaniesRepository(companiesLocalDataSource)
+                    .apply { INSTANCE = this }
+        }
+
+        @JvmStatic fun destroyInstance() {
+            INSTANCE = null
+        }
+    }
+
 
     private fun createDummyCompanies(){
 
@@ -102,23 +188,9 @@ class CompaniesRepository(val companiesLocalDataSource: CompaniesDataSource) : C
 
         for (i in 0 until companies.size) {
             for (j in 0 until strArrMatrix[i].size) {
-                companies[i].productList.add(Product(strArrMatrix[i][j], companies[i].id))
+                saveProduct(Product(strArrMatrix[i][j], companies[i].id))
             }
-            companyList.add(companies[i])
-        }
-    }
-
-    companion object {
-
-        private var INSTANCE: CompaniesRepository? = null
-
-        @JvmStatic fun getInstance(companiesLocalDataSource: CompaniesDataSource): CompaniesRepository {
-            return INSTANCE ?: CompaniesRepository(companiesLocalDataSource)
-                    .apply { INSTANCE = this }
-        }
-
-        @JvmStatic fun destroyInstance() {
-            INSTANCE = null
+            saveCompany(companies[i])
         }
     }
 }

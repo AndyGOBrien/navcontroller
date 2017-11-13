@@ -9,10 +9,22 @@ object CompaniesPersistenceContract {
 
     object CompaniesEntry : BaseColumns{
 
-        val TABLE_NAME = "companies"
-        val COLUMN_NAME_ENTRY_ID = "entryid"
-        val COLUMN_NAME_NAME = "name"
-        val COLUMN_NAME_TICKER = "ticker"
+        val COMPANY_TABLE_NAME = "companies"
+        val COLUMN_COMPANY_ENTRY_ID = "companyentryid"
+        val COLUMN_COMPANY_NAME = "name"
+        val COLUMN_COMPANY_TICKER = "ticker"
+        val COLUMN_COMPANY_DOMAIN = "domain"
+
+    }
+
+    object ProductsEntry : BaseColumns{
+
+        val PRODUCT_TABLE_NAME = "products"
+        val COLUMN_PRODUCT_ENTRY_ID = "productentryid"
+        val COLUMN_PRODUCT_NAME = "name"
+        val COLUMN_PRODUCT_COMPANY_ID = "companyid"
+        val COLUMN_PRODUCT_PAGE_URL = "pageurl"
+        val COLUMN_PRODUCT_LOGO_URL = "logourl"
 
     }
 }

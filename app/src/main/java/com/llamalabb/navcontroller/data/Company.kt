@@ -10,11 +10,9 @@ import java.util.*
 data class Company(
         val name: String,
         val domain: String,
-        val initialStockTicker: String?,
+        val initialStockTicker: String? = null,
         val id: String = UUID.randomUUID().toString(),
         var logoURL: String = "https://logo.clearbit.com/$domain",
-        var productList: ArrayList<Product> = ArrayList(),
         val stockManager: StockManager = StockManager(
                 stockTicker = initialStockTicker)
 )
-

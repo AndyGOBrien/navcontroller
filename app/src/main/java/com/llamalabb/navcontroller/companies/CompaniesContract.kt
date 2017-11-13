@@ -13,11 +13,13 @@ interface CompaniesContract {
         fun showCompanies(list: List<Company>)
         fun showNoCompanies()
         fun setLoadingIndicator(active: Boolean)
+        fun showProductsUi(companyId: String)
     }
 
     interface Presenter : BasePresenter {
-        fun setCompanyNum(position: Int)
+        fun openCompanyProducts(requestedCompany: Company)
         fun loadCompanies(forceUpdate: Boolean)
+        fun deleteCompany(requestedCompany: Company)
     }
 
 }

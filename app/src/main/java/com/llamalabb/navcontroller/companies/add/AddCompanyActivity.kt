@@ -8,9 +8,9 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import com.llamalabb.navcontroller.PotentialCompany
 
 import com.llamalabb.navcontroller.R
+import com.llamalabb.navcontroller.companies.PotentialCompany
 import com.llamalabb.navcontroller.data.Company
 import com.llamalabb.navcontroller.data.CompaniesRepository
 import com.llamalabb.navcontroller.data.source.CompaniesLocalDataSource
@@ -43,11 +43,15 @@ class AddCompanyActivity : AppCompatActivity() {
         val companyName = company_name_editText.text.toString()
         val companyDomain = company_domain_editText.text.toString()
         val initialStockTicker = stock_ticker_editText.text.toString()
-        companiesRepository.addCompany(Company(companyName, companyDomain,
-                initialStockTicker.let{ if (it.isNullOrBlank()) null else it }))
+        val company = Company(companyName, companyDomain,
+                initialStockTicker.let{ if (it.isBlank()) null else it })
 
-        companiesRepository.companyNum = companiesRepository.getCompanyList().lastIndex
-        startActivity(Intent(this, ProductsActivity::class.java))
+        companiesRepository.saveCompany(company)
+
+        startActivity(Intent(this, ProductsActivity::class.java).apply{
+            putExtra(ProductsActivity.COMPANY_ID, company.id)
+        })
+
         finish()
     }
 

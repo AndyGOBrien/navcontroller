@@ -16,12 +16,17 @@
         <activity android:name=".companies.CompaniesActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER"/>
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".companies.add.AddCompanyActivity"/>
+        <activity android:name=".companies.add.AddCompanyActivity" />
         <activity android:name=".products.ProductsActivity" />
         <activity android:name=".products.add.AddProductActivity" />
+        <activity
+            android:name=".products.ProductWebViewActivity"
+            android:label="@string/title_activity_product_web_view"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

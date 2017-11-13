@@ -12,10 +12,13 @@ interface ProductsContract {
         fun showProducts(companyName: String, list: List<Product>)
         fun showNoProducts(companyName: String)
         fun setLoadingIndicator(active: Boolean)
+        fun showProductPageUi(productUrl: String?)
     }
 
     interface Presenter : BasePresenter {
         fun loadProducts(forceUpdate: Boolean)
+        fun openProductPage(product: Product)
+        fun deleteProduct(product: Product)
     }
 
 }

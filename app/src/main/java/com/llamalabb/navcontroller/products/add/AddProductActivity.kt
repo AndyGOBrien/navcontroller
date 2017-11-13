@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.llamalabb.navcontroller.R
-import com.llamalabb.navcontroller.data.CompaniesDataSource
+import com.llamalabb.navcontroller.R.id.add_button
 import com.llamalabb.navcontroller.data.CompaniesRepository
+import com.llamalabb.navcontroller.data.Product
 import com.llamalabb.navcontroller.data.source.CompaniesLocalDataSource
+import com.llamalabb.navcontroller.products.ProductsActivity
 import kotlinx.android.synthetic.main.add_product_act.*
 
 /**
@@ -29,7 +31,16 @@ class AddProductActivity : AppCompatActivity(){
 
     private fun addButtonAction() {
         val productName = product_name_editText.text.toString()
-        companiesRepository.addCompanyProduct(productName)
+        val companyId = intent.getStringExtra(ProductsActivity.COMPANY_ID)
+        val productPageUrl = product_url_editText.text.toString()
+        val productLogoUrl = product_logo_editText.text.toString()
+        val product = Product(
+                productName,
+                companyId,
+                productLogoUrl.let{if(it.isBlank()) null else it},
+                productPageUrl.let{if(it.isBlank()) null else it}
+        )
+        companiesRepository.saveProduct(product)
         finish()
     }
 

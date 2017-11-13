@@ -1,5 +1,6 @@
 package com.llamalabb.navcontroller.products
 
+import com.llamalabb.navcontroller.data.CompaniesDataSource
 import com.llamalabb.navcontroller.data.CompaniesRepository
 import com.llamalabb.navcontroller.data.Product
 
@@ -7,11 +8,15 @@ import com.llamalabb.navcontroller.data.Product
  * Created by andy on 10/24/17.
  */
 class ProductsPresenter(
+        private val companyId: String,
         private val productsView: ProductsContract.View,
         private val companiesRepository: CompaniesRepository)
     : ProductsContract.Presenter{
 
+
     private var firstLoad = true
+
+    private val companyName = companiesRepository.cachedCompanies[companyId]!!.name
 
     init{
         productsView.presenter = this
@@ -22,7 +27,7 @@ class ProductsPresenter(
     }
 
     override fun loadProducts(forceUpdate: Boolean) {
-        loadProducts(forceUpdate || firstLoad, true)
+        loadProducts(forceUpdate || firstLoad, false)
         firstLoad = false
     }
 
@@ -31,20 +36,38 @@ class ProductsPresenter(
             productsView.setLoadingIndicator(true)
         }
 
-        val products = companiesRepository.getCompanyProductList()
-        processProducts(products)
+        companiesRepository.getProducts(companyId, object: CompaniesDataSource.LoadProductsCallback{
+            override fun onProductsLoaded(products: List<Product>) {
+                processProducts(products)
+            }
 
-        productsView.setLoadingIndicator(false)
+            override fun onDataNotAvailable() {
+                productsView.showNoProducts(companyName)
+                productsView.setLoadingIndicator(false)
+            }
+
+        })
+
     }
 
-    private fun processProducts(products: List<Product>){
-        with(companiesRepository){
-            val companyName = getCompanyList()[companyNum].name
-
-            if(products.isEmpty())
+    private fun processProducts(products: List<Product>?){
+        products?.let{
+            if(it.isEmpty()) {
                 productsView.showNoProducts(companyName)
-            else
-                productsView.showProducts(companyName, products)
-        }
+                productsView.setLoadingIndicator(false)
+            } else {
+                productsView.showProducts(companyName, it)
+                productsView.setLoadingIndicator(false)
+            }
+        } ?: productsView.showNoProducts(companyName)
+    }
+
+    override fun openProductPage(product: Product) {
+        productsView.showProductPageUi(product.productURL)
+    }
+
+    override fun deleteProduct(product: Product) {
+        companiesRepository.deleteProduct(product.id)
+        loadProducts(true, false)
     }
 }

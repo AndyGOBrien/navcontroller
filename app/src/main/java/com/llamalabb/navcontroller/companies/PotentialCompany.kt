@@ -1,4 +1,4 @@
-package com.llamalabb.navcontroller
+package com.llamalabb.navcontroller.companies
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
